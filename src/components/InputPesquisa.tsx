@@ -1,7 +1,8 @@
 import { AnimalI } from "@/utils/types/animais";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { EspecieI } from "@/utils/types/especies";
 type Inputs = {
   genero: string;
   especie: string;
@@ -14,8 +15,27 @@ type InputPesquisaProps = {
 
 export function FiltrosPesquisa({ setAnimais }: InputPesquisaProps) {
   const { register, handleSubmit, reset } = useForm<Inputs>();
+  const [especie, setEspecie] = useState<EspecieI[]>([])
 
+  useEffect(() => {
+
+    async function getEspecies() {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/especies`)
+      const dados = await response.json()
+      console.log(dados);
+
+      setEspecie(dados)
+    }
+    getEspecies()
+
+  }, [])
+
+  const optionsEspecies = especie.map(especie => (
+    <option key={especie.id} value={especie.id}>{especie.nome}</option>
+  ))
+  
   async function enviaPesquisa(data: Inputs) {
+    console.log(data);
     if (!data.genero && !data.especie && !data.porte) {
       toast.warning("Escolha pelo menos um filtro!");
       return;
@@ -66,11 +86,11 @@ export function FiltrosPesquisa({ setAnimais }: InputPesquisaProps) {
           <label className="mb-1 text-sm font-medium text-gray-900">Espécie</label>
           <select
             className="p-2 border rounded  w-20 sm:w-full"
+            id="especie"
             {...register("especie")}
           >
             <option value="">Selecione uma Espécie</option>
-            <option value="Cachorro">Cachorro</option>
-            <option value="Gato">Gato</option>
+            {optionsEspecies}
           </select>
         </div>
 
