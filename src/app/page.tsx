@@ -24,9 +24,14 @@ export default function Home() {
   }, [])
   
 
-  const listaAnimais = animais.map(animal => (
+  const listaAnimais = 
+  Array.isArray(animais) && animais.length > 0 ?(
+    animais.map(animal => (
     <ItemAnimais data={animal} key={animal.id} />
   ))
+) : (
+  <p> Nenhum animal encontrado.</p>
+)
 
 
   return (
